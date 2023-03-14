@@ -73,5 +73,10 @@ for s in range(len(off_list)-1):
 #print(total)
 
 # Calculate total off time
-down_time = total + total_time_diff
+
+if total_time_diff > 0:
+    down_time = total - total_time_diff
+elif total_time_diff < 0:
+    down_time = total + total_time_diff
+    
 print("Total Downtime: ", '{:02d}:{:02d}'.format(*divmod(down_time, 60)))
