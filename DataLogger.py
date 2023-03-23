@@ -1,5 +1,4 @@
 
-
 class DataLogger:
 
     # List containing original .csv data as dictionary with keys Time and Ext. Input 1 digital
@@ -41,7 +40,7 @@ class DataLogger:
         for t in range(len(time_list)):
             if time_list[t][0] < 15 and time_list[t][0] > 6:
                 day_list.append(time_list[t])
-            if time_list[t][0] > 15 or time_list[t][0] < 6:
+            if time_list[t][0] >= 15 or time_list[t][0] < 6:
                 afternoon_list.append(time_list[t])
 
     @classmethod
@@ -57,7 +56,11 @@ class DataLogger:
     @classmethod
     def convert_to_minutes(cls, time_list_minutes, lis):
         for q in range(len(lis)):
-            time_list_minutes.append(lis[q][0] * 60 + lis[q][1])
+            if lis[q][0] == 0:
+                time_list_minutes.append(lis[q][0] + 24 * 60 + lis[q][1])
+            else:
+                time_list_minutes.append(lis[q][0] * 60 + lis[q][1])
+
 
     @classmethod
     def list_of_states(cls, lis1, lis2):
@@ -73,7 +76,10 @@ class DataLogger:
             res = on_li[z] - off_li[z]
             total_time_diff = total_time_diff + res
             # print(total_time_diff)
+            #print(res)
+            #print(total_time_diff)
         return total_time_diff
+
 
     @classmethod
     def find_total_run_time(cls, time_list):
@@ -95,8 +101,14 @@ class DataLogger:
     def calculate_downtime(cls, shift_id, total_run_time, total_time_diff):
         if shift_id == 'Days':
             down_time = total_run_time - total_time_diff - 25
-        elif shift_id == 'Afternoons':
-            down_time = total_run_time * total_time_diff - 15
+        elif shift_id == 'Afternoons' and total_run_time > 300 and total_time_diff > 0:
+            down_time = total_run_time - total_time_diff - 35
+        elif shift_id == 'Afternoons' and total_run_time < 300 and total_time_diff > 0:
+            down_time = total_run_time - total_time_diff
+        elif shift_id == 'Afternoons' and total_run_time > 300 and total_time_diff < 0:
+            down_time = total_run_time + total_time_diff - 35
+        elif shift_id == 'Afternoons' and total_run_time < 300 and total_time_diff < 0:
+            down_time = total_run_time + total_time_diff
         return down_time
 
     @classmethod
@@ -104,38 +116,8 @@ class DataLogger:
         for r in range(len(minutes_list)):
             hhmm_list.append('{:02d}:{:02d}'.format(*divmod(minutes_list[r], 60)))
 
-class Report(DataLogger):
-    def __int__(self, time_list, day_list, afternoon_list, day_list_minutes, afternoon_list_minutes, on_list, off_list, total_time_list, day_list_states, hhmm_list, down_time):
-        self.time_list = time_list
-        self.day_list = day_list
-        self.afternoon_list = afternoon_list
-        self.day_list_minutes = day_list_minutes
-        self.afternoon_list_minutes = afternoon_list_minutes
-        self.on_list = on_list
-        self.off_list = off_list
-        self.total_time_list = total_time_list
-        self.day_list_states = day_list_states
-        self.hhmm_list = hhmm_list
-        self.down_time = down_time
 
-    def initialize_report(self,time_list, day_list, afternoon_list, day_list_minutes, afternoon_list_minutes, on_list, off_list, total_time_list, day_list_states, hhmm_list, down_time):
-        time_list = time_list
-        day_list = day_list
-        afternoon_list = afternoon_list
-        day_list_minutes = day_list_minutes
-        afternoon_list_minutes = afternoon_list_minutes
-        on_list = on_list
-        off_list = off_list
-        total_time_list = total_time_list
-        day_list_states = day_list_states
-        hhmm_list = hhmm_list
-        down_time = down_time
 
-    def display(self,time_list, day_list, afternoon_list, day_list_minutes, afternoon_list_minutes, on_list, off_list, total_time_list, day_list_states, hhmm_list, down_time):
-        print(time_list)
-        print(hhmm_list)
-        print(down_time)
-        print(day_list)
 
 """""
     @classmethod
@@ -145,7 +127,3 @@ class Report(DataLogger):
         hhmm = f'{hours}:{minutes}'
         return hhmm
 """
-
-
-
-
